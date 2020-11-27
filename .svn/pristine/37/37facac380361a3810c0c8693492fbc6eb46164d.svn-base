@@ -1,0 +1,24 @@
+
+
+//品种分类
+ var varietyCatalog = {
+    //棉花
+    CF : 'CF',
+    //硅铁
+    SF : 'SF',
+	//苹果
+	AP : 'AP',
+	//甲醇
+	MA : 'MA',
+	//白糖
+	SR : 'SR',
+	//动力煤
+	ZC : 'ZC'
+}
+
+//品种代码，根据需要调整
+var g_variety_id = varietyCatalog.ZC;
+import {matchConditionByVariety,loadupDisplayCondition, conditionPanelInnerHtml, addConditionPanelHtml,getParam, makeConditionStore, displayConditionList,displayWarehouseTable, displayWareHouseValue, editConditionByVariety,validateCondition}
+	from './variety/content-ZC.js';
+
+export {g_variety_id,varietyCatalog, matchConditionByVariety,loadupDisplayCondition, conditionPanelInnerHtml, addConditionPanelHtml,getParam, makeConditionStore, displayConditionList, displayWarehouseTable,displayWareHouseValue, editConditionByVariety,validateCondition}

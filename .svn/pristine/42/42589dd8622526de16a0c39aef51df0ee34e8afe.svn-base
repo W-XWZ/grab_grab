@@ -1,0 +1,153 @@
+function matchConditionByVariety(current_priority, v){
+	
+	let balQty = v['balQty'];
+	//防止异常情况
+	if(!balQty){
+		balQty = 1;
+	}
+
+		let placeName = v['placeName'] == null ? "" : v['placeName'];
+		let w_id = v['whId'] == null ? "" : v['whId'] ;
+		let cash = v['agio'];
+		let make_date = v['makeDate'] == null ? "":v['makeDate'] ;
+
+		//升贴水有null
+		if(!cash){
+			cash = 0;
+		}
+		
+		//支持多仓库 多个仓库用逗号进行分割
+		if(matchWarehouse(current_priority, w_id)){
+			return true;
+		}
+		if(matchMakeDate(current_priority, make_date)){
+			return true;
+		}
+		if (current_priority['district'] != '' && (null == placeName ||(placeName !=null && placeName.indexOf(current_priority['district']) < 0))) {
+			return true;
+		}
+		if (current_priority['premium_rise_lower_limit'] != '' && parseInt(current_priority['premium_rise_lower_limit']) >= cash) {
+			return true;
+		}
+		if (current_priority['premium_rise_upper_limit'] != '' && parseInt(current_priority['premium_rise_upper_limit']) <= cash) {
+			return true;
+		}
+
+}
+
+function loadupDisplayCondition(item, q) {
+		let match = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;优先度" + q;
+		let district = item[q]["district"];
+		let warehouse = item[q]["warehouse"];
+		let make_date = item[q]["make_date"];
+		let premium_rise_upper_limit = item[q]["premium_rise_upper_limit"];
+		let premium_rise_lower_limit = item[q]["premium_rise_lower_limit"];
+		match += "仓库: " + warehouse + "年份: " + make_date+ "产地: " + district + "升贴水下限: " + premium_rise_lower_limit + "升贴水上限: " + premium_rise_upper_limit;
+	return match;
+}
+
+function conditionPanelInnerHtml(priorInfo, i){
+
+		let innerHTML = `
+			优先度` + i + `:
+			<input class = "condition-input" id="district_` + i +
+					`" placeholder="产地" type="text" style='width:100px' value = "` + priorInfo['district'] +
+					`"/> 
+				<input class = "condition-input" id="warehouse_` +
+					i + `" placeholder="仓库" type="text" style='width:100px' value = "` + priorInfo['warehouse'] +
+					`"/> 
+				<input class = "condition-input" id="make_date_` +
+					i + `" placeholder="年份" type="text" style='width:100px' value = "` + priorInfo['make_date'] +
+					`"/> 
+				<input class = "condition-input" id="premium_rise_lower_limit_` +
+					i +
+					`" type="number" placeholder="升贴水下限" style='width:100px' value = "` + priorInfo['premium_rise_lower_limit'] +
+					`"/> 
+			<input class = "condition-input" id="premium_rise_upper_limit_` +
+					i + `" type="number" placeholder="升贴水上限" style='width:100px' value = "` + priorInfo['premium_rise_upper_limit'] +
+					`"/> 
+			</br>
+				`;
+	return innerHTML;
+}
+
+function addConditionPanelHtml(editPriorNum){
+
+		let innerHTML = `
+				优先度` + editPriorNum + `:
+			<input class = "condition-input" id="district_` + editPriorNum +
+			`" placeholder="产地" type="text" style='width:100px'/> 
+			<input class = "condition-input" id="warehouse_` +
+			editPriorNum +
+			`" placeholder="仓库" type="text" style='width:100px'/> 
+			<input class = "condition-input" id="make_date_` +
+			editPriorNum +
+			`" placeholder="年份" type="text" style='width:100px'/> 
+			<input class = "condition-input" id="premium_rise_lower_limit_` +
+			editPriorNum +
+			`" type="number" placeholder="升贴水下限" style='width:100px'/>
+		<input class = "condition-input" id="premium_rise_upper_limit_` +
+			editPriorNum + `" type="number" placeholder="升贴水上限" style='width:100px'/>
+		</br>
+		`;
+	return innerHTML;
+}
+function getParam(variety, commodity_id, round_number){
+	let param = {};
+	param.classId = variety;
+	param.commodityId = commodity_id;
+	param.pageIndex = 1;
+	param.pageSize = 10000;
+	param.settleType = "";
+	param.roundId=round_number;
+	
+	param.orderColumn="AGIO";
+	param.orderDir ="ASC";
+	param.formDefine=JSON.parse("{\"formDefineId\":10032,\"formId\":\"selection_query_condition\",\"formAttrDefines\":[{\"attrId\":1863,\"formAttrDefineId\":3038,\"name\":\"WH_ID\",\"bizName\":\"whId\",\"value\":null},{\"attrId\":4,\"formAttrDefineId\":3039,\"name\":\"PLACE_NAME\",\"bizName\":\"placeName\",\"value\":null},{\"attrId\":1864,\"formAttrDefineId\":3040,\"name\":\"MAKE_DATE\",\"bizName\":\"makeDate\",\"value\":null},{\"attrId\":1851,\"formAttrDefineId\":3041,\"name\":\"LEV_ID\",\"bizName\":\"levId\",\"value\":null},{\"attrId\":1871,\"formAttrDefineId\":3042,\"name\":\"AGIO\",\"bizName\":\"agio\",\"value\":null},{\"attrId\":1868,\"formAttrDefineId\":3043,\"name\":\"ITEM_ID\",\"bizName\":\"itemId\",\"value\":null}]}");
+	
+	return param;
+}
+
+//保存输入的条件
+	function makeConditionStore(i, condition){
+		let warehouse = $('#warehouse_' + i).val();
+		let make_date = $('#make_date_' + i).val();
+		
+			let district = $('#district_' + i).val();
+			let premium_rise_upper_limit = $('#premium_rise_upper_limit_' + i).val();
+			let premium_rise_lower_limit = $('#premium_rise_lower_limit_' + i).val();
+			condition[i] = {
+				"district": district,
+				"warehouse": warehouse,
+				"make_date": make_date,
+				"premium_rise_upper_limit": premium_rise_upper_limit,
+				"premium_rise_lower_limit": premium_rise_lower_limit,
+				"condition_num": window.localStorage['condition_num']
+			}
+		
+	}
+	
+	//根据选中品种展示条件列表
+	function displayConditionList(tempNum){
+		let innerHTML = `
+					优先度` + tempNum + `:
+				<input class = "condition-input" id="district_` + tempNum +
+				`" placeholder="产地" type="text" style='width:100px'/> 
+				<input class = "condition-input" id="warehouse_` +
+				tempNum +
+				`" placeholder="仓库" type="text" style='width:100px'/> 
+				<input class = "condition-input" id="make_date_` +
+				tempNum +
+				`" placeholder="年份" type="text" style='width:100px'/> 
+				<input class = "condition-input" id="premium_rise_lower_limit_` +
+				tempNum +
+				`" type="number" placeholder="升贴水下限" style='width:100px'/>
+			<input class = "condition-input" id="premium_rise_upper_limit_` +
+				tempNum + `" type="number" placeholder="升贴水上限" style='width:100px'/>
+			</br>
+			`;
+		
+		return innerHTML;
+	}
+	
+export  {matchConditionByVariety,loadupDisplayCondition, conditionPanelInnerHtml, addConditionPanelHtml,getParam, makeConditionStore, displayConditionList}

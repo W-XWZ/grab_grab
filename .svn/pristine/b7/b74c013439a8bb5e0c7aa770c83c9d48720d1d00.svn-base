@@ -1,0 +1,127 @@
+$(function () {
+
+    //加载设置
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    	if(request=="getready"){
+    		$('#add').attr('disabled','true');
+
+    	}
+    	sendResponse('我是popup，我已收到你的消息：' + JSON.stringify(request));
+    });
+
+    function getCurrentTabId(callback) {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            if (callback) callback(tabs.length ? tabs[0].id : null);
+        });
+    }
+
+    function sendMessageToContentScript(message, callback) {
+        getCurrentTabId(function (tabId) {
+            chrome.tabs.sendMessage(tabId, message, function (response) {
+                if (callback) callback(response);
+            });
+        });
+    }
+
+
+    /**
+     * 验证仓库输入格式
+     * @param obj
+     * @returns {boolean}
+     */
+    function validateWarehouse(obj){
+        let pattern = /^[0-9,]*$/;
+        let reg = new RegExp(pattern);
+        if("" == obj){
+            return true;
+        }
+        if(!reg.test(obj)){
+            return  false;
+        }
+        return true
+    }
+
+    let condition = {};
+    //获取唯一的condition_num 组装优先度组并向页面推送
+    $('#add').on('click', function () {
+        if(!window.localStorage['condition_num']){
+            window.localStorage['condition_num'] = 1;
+        }else{
+            window.localStorage['condition_num'] = parseInt(window.localStorage['condition_num'])+1 ;
+        }
+        //参数校验
+        if(!$('#amount').val()){
+
+            alert("必须填写仓单数量");
+            return;
+        }
+        for (let i = 1; i < tempNum; i++) {
+
+            let warehouse = $('#warehouse_' + i).val();
+            if(validateWarehouse(warehouse) == false){
+                alert("参数错误， warehouse：" + warehouse);
+                return;
+            }
+        }
+
+        condition['amount'] = $('#amount').val();
+        condition["condition_num"] = window.localStorage['condition_num'];
+        for (let i = 1; i < tempNum; i++) {
+
+            let district = $('#district_' + i).val();
+            let warehouse = $('#warehouse_' + i).val();
+            let premium_rise_upper_limit = $('#premium_rise_upper_limit_' + i).val();
+            let premium_rise_lower_limit = $('#premium_rise_lower_limit_' + i).val();
+            condition[i] = {
+                "district": district,
+                "warehouse": warehouse,
+                "premium_rise_upper_limit": premium_rise_upper_limit,
+                "premium_rise_lower_limit": premium_rise_lower_limit,
+                "condition_num": window.localStorage['condition_num']
+            }
+        }
+        sendMessageToContentScript({
+            "action": "addIntoConditions",
+            "condition": JSON.stringify(condition)
+        }, function (response) {
+        });
+    });
+
+
+    //全局优先级级别
+    var tempNum = 2;
+    $('#addPriority').on('click', function () {
+        if(tempNum >= 11){
+            alert("最多10个优先级");
+            return
+        }
+        let div = document.getElementById("main")
+        let panel = document.createElement('div');
+        panel.id = "div" + tempNum;
+        panel.style.zIndex = 99999;
+        panel.className = 'chrome-plugin-demo-panel';
+
+        panel.innerHTML = `
+		优先度` + tempNum + `:
+<input class = "condition-input" id="district_` + tempNum + `" placeholder="产地" type="text" style='width:100px'/> 
+    <input class = "condition-input" id="warehouse_` + tempNum + `" placeholder="仓库" type="text" style='width:100px'/> 
+    <input class = "condition-input" id="premium_rise_lower_limit_` + tempNum + `" type="number" placeholder="升贴水下限" style='width:100px'/>
+<input class = "condition-input" id="premium_rise_upper_limit_` + tempNum + `" type="number" placeholder="升贴水上限" style='width:100px'/>
+
+</br>
+	`;
+        div.appendChild(panel);
+        tempNum++;
+    });
+
+    $('#delPriority').on('click', function () {
+        if(tempNum == 2){
+            alert("只剩最后一条了，无法删除");
+            return
+        }
+        tempNum--;
+        $("#div" + tempNum).remove()
+
+    });
+
+});

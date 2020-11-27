@@ -1,0 +1,15 @@
+
+
+//品种分类
+ var varietyCatalog = {
+    //棉花
+    CF : 'CF',
+    //硅铁
+    SF : 'SF'
+}
+
+//品种代码，写死棉花
+var g_variety_id = varietyCatalog.CF;
+import {matchConditionByVariety,loadupDisplayCondition, conditionPanelInnerHtml, addConditionPanelHtml,getParam, makeConditionStore, displayConditionList} from './variety/content-CF.js';
+
+export {g_variety_id,varietyCatalog, matchConditionByVariety,loadupDisplayCondition, conditionPanelInnerHtml, addConditionPanelHtml,getParam, makeConditionStore, displayConditionList}
