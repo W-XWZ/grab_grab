@@ -488,7 +488,7 @@ function loadupCondition(variety) {
 		delPriorityImg.style="width: 20px;";
 		let delDiv = document.createElement("div");
 		delDiv.appendChild(delPriorityImg);
-		delDiv.className = 'del-div delete_icon';
+		delDiv.className = 'del-div-con delete_icon';
 		delDiv.value = item["condition_num"];
 		condition_panel.append(delDiv);
 		let editPriorityImg = document.createElement("img");
@@ -743,6 +743,7 @@ function delPriorityFun() {
 	document.getElementById("div" + editPriorNum).appendChild(delDiv);
 	return editPriorNum;
 }
+
 //新增优先级
 function addPriorityFun(condition_panel) {
 	if (editPriorNum >= 10) {
@@ -1076,7 +1077,7 @@ function initCustomPanel() {
 		<div id='process'></div>
 		<div id='conditions'></div>
 		</div>
-		<div class="condition-panel-btn" style="text-align: center;">
+		<div class="condition-panel-btn" style="text-align: center;margin-left: 25%;">
             <input class= "condition-button" id="getDetails" type="button" value="查看仓单"/>
             <input class= "condition-button" id="closeDetail" type="button" value="关闭仓单"/>
 		</div>
@@ -1180,6 +1181,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		};
 		saveLocalStorage(varitety_conditions);
 		loadupCondition(variety);
+		tip('添加成功')
 	}
 	/*	if(request.cmd == 'update_font_size') {
 	        var ele = document.createElement('style');

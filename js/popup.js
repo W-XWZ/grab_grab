@@ -97,25 +97,47 @@ $(function() {
 			return
 		}
 		
-		let div = document.getElementById("main")
+		let div = document.getElementById("main_condition")
 		let panel = document.createElement('div');
 		panel.id = "div" + tempNum;
 		panel.style.zIndex = 99999;
-		panel.className = 'chrome-plugin-demo-panel';
+		panel.className = 'condition-line';
 		
 		panel.innerHTML = addConditionPanelHtml( tempNum);
 		div.appendChild(panel);
 		tempNum++;
+
+		$(".del-div").remove();
+		let delPriorityImg = document.createElement("img");
+		delPriorityImg.src = "img/del.png";
+		delPriorityImg.style="width: 20px;";
+		let delDiv = document.createElement("div");
+		delDiv.appendChild(delPriorityImg);
+		delDiv.className = 'del-div';
+		delDiv.onclick = function() {
+			delPriorityFun();
+		};
+		panel.appendChild(delDiv);
+	
 	}
 	
-	function delClick() {
+	function delPriorityFun() {
 		if (tempNum == 2) {
 			alert("只剩最后一条了，无法删除");
 			return;
 		}
 		tempNum--;
 		$("#div" + tempNum).remove();
+		let delPriorityImg = document.createElement("img");
+		delPriorityImg.src = "img/del.png";
+		delPriorityImg.style="width: 20px;";
+		let delDiv = document.createElement("div");
+		delDiv.appendChild(delPriorityImg);
+		delDiv.className = 'del-div';
+		delDiv.onclick = function() {
+			delPriorityFun();
+		};
+		document.getElementById("div" + (tempNum-1)).appendChild(delDiv);
 	}
 	
-
 });

@@ -83,6 +83,12 @@
 	    right: 0px;
 	    position: absolute;
 }
+.del-div-con {
+	
+    top: 0px;
+    right: 0px;
+    position: absolute;
+}
 .edit-div{
 	
 	top: 0px;
@@ -95,7 +101,7 @@
 	    display: inline-block;
 }
 .condition-panel-btn{
-	
+	/* left: 25%; */
 	text-align: center;
 	position: relative;
     margin: 10px;
